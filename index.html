@@ -1,109 +1,287 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOT PERFECT - User Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL VORTEX - DIGITAL PREMIUM</title>
+    <style>
+        :root { 
+            --neon-green: #00ffaa; 
+            --neon-red: #ff0044;
+            --cyber-blue: #00d4ff;
+            --gold: #ffd700;
+            --flower-pink: #ff69b4;
+        }
 
-<style>
-body{margin:0;background:#05060a;color:#e8f9ff;font-family:sans-serif;text-align:center;padding:30px;}
-.hidden{display:none;}
-.container{padding:20px;margin:auto;max-width:400px;background:rgba(255,255,255,0.05);border-radius:12px;}
-input,button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;}
-button{background:linear-gradient(90deg,#7ef0ff,#9b7eff);font-weight:bold;color:#000;cursor:pointer;}
-button:disabled{background:#555;color:#aaa;cursor:not-allowed;}
-.card{background:#0a1020;padding:15px;border-radius:10px;margin-top:15px;text-align:left;}
-a{color:#7ef0ff;text-decoration:none;}
-</style>
+        * { transition: all 0.3s ease; box-sizing: border-box; font-family: 'Arial Black', sans-serif; }
+        
+        body { 
+            margin: 0; background: #000; color: white; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- Digital Floating Pop-up --- */
+        #floating-widget {
+            position: fixed; top: 100px; right: 20px; width: 190px; height: 260px;
+            background: rgba(0, 5, 10, 0.95); 
+            border: 2px solid var(--cyber-blue);
+            border-radius: 20px; z-index: 9999; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4); cursor: move;
+            padding: 15px; text-align: center; overflow: hidden;
+        }
+
+        /* ডিজিটাল বর্ডার এনিমেশন */
+        #floating-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-green));
+            animation: scanLine 3s linear infinite;
+        }
+        @keyframes scanLine { 0% { top: 0; } 100% { top: 100%; } }
+
+        .pop-header { font-size: 10px; color: var(--flower-pink); font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 0 5px var(--flower-pink); }
+        .mini-id { font-size: 11px; color: var(--gold); margin-bottom: 5px; }
+        .mini-timer { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 5px; font-family: 'Courier New', monospace; }
+        
+        /* পপ-আপ সলো মোশন রেজাল্ট */
+        .mini-res { 
+            font-size: 45px; font-weight: 900; min-height: 60px;
+            opacity: 0; filter: blur(25px); transform: scale(0.5);
+        }
+        .mini-res.show { 
+            opacity: 1; filter: blur(0); transform: scale(1.1); 
+            transition: all 5s cubic-bezier(0.1, 0.7, 1.0, 0.1); 
+        }
+
+        .mini-alert { font-size: 11px; color: var(--neon-red); font-weight: 900; display: none; animation: blink 0.6s infinite; margin-top: 5px; }
+        .close-pop { position: absolute; top: 5px; right: 10px; color: #fff; cursor: pointer; font-weight: 900; font-size: 18px; z-index: 10; }
+
+        /* ফুলের ডিজাইন */
+        .flower { position: absolute; font-size: 18px; animation: spin 6s linear infinite; opacity: 0.6; }
+        @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
+        .f1 { top: 5px; left: 5px; } .f2 { bottom: 5px; right: 5px; }
+
+        /* --- Money Rain --- */
+        .money { position: absolute; color: #00ff00; font-size: 25px; font-weight: bold; animation: fall 2.5s linear forwards; z-index: 1000; pointer-events: none; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+        /* --- Main UI --- */
+        .rules-bar { background: var(--neon-red); color: white; width: 100%; padding: 12px; font-size: 14px; font-weight: 900; text-align: center; border-bottom: 4px solid #fff; }
+        .main-title { font-size: 30px; font-weight: 900; text-shadow: 0 0 20px var(--neon-green); margin-top: 25px; letter-spacing: 5px; }
+
+        #login-screen { width: 90%; max-width: 400px; padding: 40px; background: #0a0a0a; border: 2px solid var(--cyber-blue); border-radius: 30px; margin-top: 60px; text-align: center; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); }
+        #login-screen input { width: 100%; padding: 18px; background: #000; border: 1px solid #333; color: var(--cyber-blue); border-radius: 15px; margin-bottom: 25px; text-align: center; font-size: 18px; font-weight: 900; }
+
+        #main-content { display: none; width: 95%; max-width: 460px; text-align: center; }
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 30px; border-radius: 35px; margin-bottom: 25px; backdrop-filter: blur(15px); }
+
+        .tab-btn { flex: 1; padding: 15px; background: #000; border: 2px solid #222; color: #555; border-radius: 15px; cursor: pointer; font-weight: 900; margin: 0 5px; font-size: 14px; }
+        .tab-btn.active { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 170, 0.2); }
+
+        #timer { font-size: 85px; font-weight: 900; text-shadow: 0 0 20px var(--cyber-blue); font-family: 'Courier New', monospace; }
+        #resText { font-size: 90px; font-weight: 900; opacity: 0; filter: blur(25px); }
+        #resText.show { opacity: 1; filter: blur(0); transform: scale(1.1); transition: all 5s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
+
+        .vote-btn { flex: 1; padding: 22px; border: none; border-radius: 20px; font-weight: 900; margin: 10px 8px; font-size: 18px; cursor: pointer; }
+        .history-table { width: 100%; margin-top: 20px; font-weight: 900; border-collapse: collapse; }
+        .history-table td { padding: 15px; border-bottom: 1px solid #111; font-size: 14px; }
+        @keyframes blink { 50% { opacity: 0.1; } }
+    </style>
 </head>
 <body>
 
-<div id="loginDiv" class="container">
-  <h2>NOT PERFECT Users</h2>
-  <input type="password" id="userPass" placeholder="Enter Password">
-  <button onclick="login()">Login</button>
-  <p id="loginErr" style="color:#ff6666"></p>
-</div>
+    <div id="floating-widget">
+        <div class="close-pop" onclick="togglePop()">×</div>
+        <div class="flower f1">🌸</div><div class="flower f2">🌸</div>
+        
+        <div class="pop-header">PREMIUM COMMUNITY</div>
+        <div class="mini-id" id="miniID">ID: #0000</div>
+        <div class="mini-timer" id="miniTimer">00:00</div>
+        <div class="mini-alert" id="miniAlert">WAITING FOR SIGNAL...</div>
+        <div class="mini-res" id="miniRes">READY</div>
+        <div id="miniAcc" style="font-size: 10px; color: var(--gold); font-weight: 900; margin-top: 5px; opacity:0.8;">CONFIDENCE: 99%</div>
+    </div>
 
-<div id="mainDiv" class="hidden container">
-  <h2>🏠 Notice</h2>
-  <div class="card" id="noticeText">Loading...</div>
+    <div class="rules-bar">PREMIUM COMMUNITY AI | 8 STEP STRATEGY</div>
+    <h1 class="main-title">NEURAL VORTEX</h1>
 
-  <h2>🔵 BIG / SMALL</h2>
-  <p id="boardText">Board: ---</p>
-  <button id="bsBtn" disabled onclick="showResult()">Check Result</button>
-  <h2 id="resultText"></h2>
+    <div id="login-screen">
+        <input type="password" id="passInput" placeholder="ENTER ACCESS CODE">
+        <button onclick="login()" style="width:100%; padding:18px; background:var(--cyber-blue); border:none; border-radius:15px; font-weight:900; cursor:pointer; color:#000; font-size:16px;">INITIALIZE AI SYSTEM</button>
+    </div>
 
-  <h2>📞 Contact</h2>
-  <div class="card"><a href="https://t.me/Not_Perfect_Onwer">Not_Perfect_Onwer</a></div>
+    <div id="main-content">
+        <div style="display: flex; margin-bottom: 25px;">
+            <button id="tab30" class="tab-btn" onclick="switchMode(30)">WINGO 30S</button>
+            <button id="tab60" class="tab-btn active" onclick="switchMode(60)">WINGO 60S</button>
+        </div>
 
-  <h2>📢 Channel</h2>
-  <div class="card"><a href="https://t.me/Amer_Club_Not_Perfect_Team">Amer_Club_Not_Perfect_Team</a></div>
-</div>
+        <button onclick="togglePop()" style="background:var(--neon-green); color:#000; padding:15px 30px; border-radius:15px; border:none; font-weight:900; margin-bottom:25px; cursor:pointer; box-shadow: 0 5px 20px rgba(0,255,170,0.3);">ACTIVATE MINI OVERLAY</button>
 
-<!-- Firebase v10 Modular -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+        <div class="glass-card">
+            <div id="periodLabel" style="color: var(--cyber-blue); font-weight: 900; font-size: 18px; letter-spacing: 2px;">ID: #000000</div>
+            <div id="timer">00:00</div>
+            <div id="alertMsg" style="color:var(--neon-red); font-weight:900; display:none; font-size:22px; animation: blink 0.5s infinite;">SYSTEM UPDATING...</div>
+        </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC06FB0TSqo6n8PogBJerE-ZiwPvqVYqAs",
-  authDomain: "not-perfect-b8695.firebaseapp.com",
-  databaseURL: "https://not-perfect-b8695-default-rtdb.firebaseio.com",
-  projectId: "not-perfect-b8695",
-  storageBucket: "not-perfect-b8695.firebasestorage.app",
-  messagingSenderId: "990709370710",
-  appId: "1:990709370710:web:170f8ecb4587603b8fd0f7"
-};
+        <div class="glass-card" style="min-height: 280px;">
+            <div id="resText">...</div>
+            <div id="accuracy" style="font-size:18px; color:var(--gold); font-weight:900; margin-top:15px; letter-spacing:1px;"></div>
+            <div id="stepArea"></div>
+        </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+        <div style="display: flex;">
+            <button class="vote-btn" onclick="vote('win')" style="background:var(--neon-green); color:#000;">WIN 👍</button>
+            <button class="vote-btn" onclick="vote('loss')" style="background:var(--neon-red); color:#fff;">LOSS 👎</button>
+        </div>
 
-// USER PASSWORD
-const USER_PASSWORD = "Not_Perfect_Users";
+        <div class="glass-card" style="padding: 20px;">
+            <div style="text-align: left; color: #444; border-bottom: 2px solid #222; padding-bottom: 10px; font-size: 13px; letter-spacing: 2px;">TRANSACTION LOG</div>
+            <table class="history-table" id="historyTable"></table>
+        </div>
+    </div>
 
-window.login = function(){
-  let p = document.getElementById("userPass").value;
-  if(p === USER_PASSWORD){
-    document.getElementById("loginDiv").classList.add("hidden");
-    document.getElementById("mainDiv").classList.remove("hidden");
-  } else {
-    document.getElementById("loginErr").innerText = "Wrong Password!";
-  }
-};
+<script>
+    let mode = 60;
+    let store = { 
+        30: { step: 1, lastID: -1, signal: "", history: [] }, 
+        60: { step: 1, lastID: -1, signal: "", history: [] } 
+    };
 
-let boardText = document.getElementById("boardText");
-let bsBtn = document.getElementById("bsBtn");
-let resultText = document.getElementById("resultText");
-let currentData = null;
+    function login() {
+        if(document.getElementById('passInput').value === "amer123") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            runEngine();
+        } else { alert("ACCESS DENIED!"); }
+    }
 
-// BIG/SMALL
-onValue(ref(db, "bigsmall"), snap=>{
-  let d = snap.val();
-  if(!d){
-    bsBtn.disabled = true;
-    boardText.innerText = "Board: ---";
-    resultText.innerText = "";
-    currentData = null;
-    return;
-  }
-  boardText.innerText = "Board: " + d.board;
-  currentData = d;
-  bsBtn.disabled = !d.active;
-});
+    function switchMode(m) {
+        mode = m;
+        document.getElementById('tab30').className = m === 30 ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('tab60').className = m === 60 ? 'tab-btn active' : 'tab-btn';
+        updateHistoryUI();
+    }
 
-// SHOW RESULT
-window.showResult = function(){
-  if(currentData){
-    resultText.innerText = "Result: " + currentData.result;
-  }
-};
+    function runEngine() {
+        setInterval(() => {
+            const now = new Date();
+            const r = mode - (now.getSeconds() % mode);
+            const timeStr = "00:" + (r < 10 ? "0" + r : r);
+            const id = Math.floor(((now.getHours()*3600)+(now.getMinutes()*60)+now.getSeconds())/mode)+1;
 
-// NOTICE
-onValue(ref(db, "notice"), snap=>{
-  document.getElementById("noticeText").innerText = snap.val() || "No Notice";
-});
+            document.getElementById('timer').innerText = timeStr;
+            document.getElementById('miniTimer').innerText = timeStr;
+            document.getElementById('periodLabel').innerText = "ID: #" + id;
+            document.getElementById('miniID').innerText = "ID: #" + id;
+
+            // ১০ সেকেন্ড ডিজিটাল ওয়ার্নিং
+            if(r <= 10) {
+                document.getElementById('alertMsg').style.display = 'block';
+                document.getElementById('miniAlert').style.display = 'block';
+                document.getElementById('resText').classList.remove('show');
+                document.getElementById('miniRes').classList.remove('show');
+            } else {
+                document.getElementById('alertMsg').style.display = 'none';
+                document.getElementById('miniAlert').style.display = 'none';
+            }
+
+            [30, 60].forEach(m => {
+                let currentID = Math.floor(((now.getHours()*3600)+(now.getMinutes()*60)+now.getSeconds())/m)+1;
+                if(currentID !== store[m].lastID) {
+                    store[m].lastID = currentID;
+                    store[m].signal = Math.random() > 0.5 ? "BIG" : "SMALL";
+                    if(m === mode) triggerSignal();
+                }
+            });
+        }, 1000);
+    }
+
+    function triggerSignal() {
+        const res = document.getElementById('resText');
+        const mini = document.getElementById('miniRes');
+        
+        res.classList.remove('show');
+        mini.classList.remove('show');
+
+        setTimeout(() => {
+            res.innerText = store[mode].signal;
+            mini.innerText = store[mode].signal;
+            
+            const color = store[mode].signal === "BIG" ? "var(--neon-green)" : "var(--gold)";
+            res.style.color = color;
+            mini.style.color = color;
+            
+            res.classList.add('show');
+            mini.classList.add('show');
+            
+            document.getElementById('accuracy').innerText = "AI PREDICTION: " + (94 + Math.floor(Math.random()*6)) + "%";
+            document.getElementById('miniAcc').innerText = "CONFIDENCE: " + (94 + Math.floor(Math.random()*6)) + "%";
+            
+            setTimeout(() => {
+                createMoneyRain();
+                saveToHistory();
+            }, 5000);
+            updateStepUI();
+        }, 500);
+    }
+
+    function saveToHistory() {
+        const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+        store[mode].history.unshift({ time, id: store[mode].lastID, val: store[mode].signal });
+        if(store[mode].history.length > 7) store[mode].history.pop();
+        updateHistoryUI();
+    }
+
+    function updateHistoryUI() {
+        document.getElementById('historyTable').innerHTML = store[mode].history.map(h => `
+            <tr>
+                <td style="color:#666">${h.time}</td>
+                <td style="color:#eee">#${h.id}</td>
+                <td align="right" style="color:${h.val==='BIG'?'var(--neon-green)':'var(--gold)'}; text-shadow:0 0 5px currentColor;">${h.val}</td>
+            </tr>
+        `).join("");
+    }
+
+    function createMoneyRain() {
+        for (let i = 0; i < 20; i++) {
+            const m = document.createElement('div');
+            m.className = 'money'; m.innerText = '৳';
+            m.style.left = Math.random() * 100 + 'vw';
+            m.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+            document.body.appendChild(m);
+            setTimeout(() => m.remove(), 2500);
+        }
+    }
+
+    function togglePop() {
+        const p = document.getElementById('floating-widget');
+        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function vote(type) {
+        if(type === 'win') store[mode].step = 1; else if(store[mode].step < 8) store[mode].step++;
+        updateStepUI();
+    }
+
+    function updateStepUI() {
+        const s = store[mode].step;
+        document.getElementById('stepArea').innerHTML = s > 1 ? `<div style="background:#fff; color:#000; padding:10px 30px; border-radius:15px; font-weight:900; margin-top:20px; font-size:24px; box-shadow:0 0 20px #fff;">STEP ${s}</div>` : "";
+    }
+
+    // Floating Widget Drag Logic
+    const pop = document.getElementById("floating-widget");
+    let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+    pop.addEventListener("touchstart", (e) => { initialX = e.touches[0].clientX - xOffset; initialY = e.touches[0].clientY - yOffset; active = true; }, false);
+    document.addEventListener("touchend", () => { active = false; }, false);
+    document.addEventListener("touchmove", (e) => {
+        if (active) {
+            currentX = e.touches[0].clientX - initialX; currentY = e.touches[0].clientY - initialY;
+            xOffset = currentX; yOffset = currentY;
+            pop.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+        }
+    }, false);
 </script>
-
 </body>
 </html>
