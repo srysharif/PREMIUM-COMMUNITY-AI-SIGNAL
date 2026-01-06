@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOT PERFECT - User Panel</title>
+
+<style>
+body{margin:0;background:#05060a;color:#e8f9ff;font-family:sans-serif;text-align:center;padding:30px;}
+.hidden{display:none;}
+.container{padding:20px;margin:auto;max-width:400px;background:rgba(255,255,255,0.05);border-radius:12px;}
+input,button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;}
+button{background:linear-gradient(90deg,#7ef0ff,#9b7eff);font-weight:bold;color:#000;cursor:pointer;}
+button:disabled{background:#555;color:#aaa;cursor:not-allowed;}
+.card{background:#0a1020;padding:15px;border-radius:10px;margin-top:15px;text-align:left;}
+a{color:#7ef0ff;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div id="loginDiv" class="container">
+  <h2>NOT PERFECT Users</h2>
+  <input type="password" id="userPass" placeholder="Enter Password">
+  <button onclick="login()">Login</button>
+  <p id="loginErr" style="color:#ff6666"></p>
+</div>
+
+<div id="mainDiv" class="hidden container">
+  <h2>🏠 Notice</h2>
+  <div class="card" id="noticeText">Loading...</div>
+
+  <h2>🔵 BIG / SMALL</h2>
+  <p id="boardText">Board: ---</p>
+  <button id="bsBtn" disabled onclick="showResult()">Check Result</button>
+  <h2 id="resultText"></h2>
+
+  <h2>📞 Contact</h2>
+  <div class="card"><a href="https://t.me/Not_Perfect_Onwer">Not_Perfect_Onwer</a></div>
+
+  <h2>📢 Channel</h2>
+  <div class="card"><a href="https://t.me/Amer_Club_Not_Perfect_Team">Amer_Club_Not_Perfect_Team</a></div>
+</div>
+
+<!-- Firebase v10 Modular -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC06FB0TSqo6n8PogBJerE-ZiwPvqVYqAs",
+  authDomain: "not-perfect-b8695.firebaseapp.com",
+  databaseURL: "https://not-perfect-b8695-default-rtdb.firebaseio.com",
+  projectId: "not-perfect-b8695",
+  storageBucket: "not-perfect-b8695.firebasestorage.app",
+  messagingSenderId: "990709370710",
+  appId: "1:990709370710:web:170f8ecb4587603b8fd0f7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// USER PASSWORD
+const USER_PASSWORD = "Not_Perfect_Users";
+
+window.login = function(){
+  let p = document.getElementById("userPass").value;
+  if(p === USER_PASSWORD){
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("mainDiv").classList.remove("hidden");
+  } else {
+    document.getElementById("loginErr").innerText = "Wrong Password!";
+  }
+};
+
+let boardText = document.getElementById("boardText");
+let bsBtn = document.getElementById("bsBtn");
+let resultText = document.getElementById("resultText");
+let currentData = null;
+
+// BIG/SMALL
+onValue(ref(db, "bigsmall"), snap=>{
+  let d = snap.val();
+  if(!d){
+    bsBtn.disabled = true;
+    boardText.innerText = "Board: ---";
+    resultText.innerText = "";
+    currentData = null;
+    return;
+  }
+  boardText.innerText = "Board: " + d.board;
+  currentData = d;
+  bsBtn.disabled = !d.active;
+});
+
+// SHOW RESULT
+window.showResult = function(){
+  if(currentData){
+    resultText.innerText = "Result: " + currentData.result;
+  }
+};
+
+// NOTICE
+onValue(ref(db, "notice"), snap=>{
+  document.getElementById("noticeText").innerText = snap.val() || "No Notice";
+});
+</script>
+
+</body>
+</html>
