@@ -21,7 +21,29 @@
             min-height: 100vh; overflow-x: hidden;
         }
 
-        /* --- Digital Floating Pop-up --- */
+        /* --- New Channel Section --- */
+        .channel-links {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            width: 95%;
+            max-width: 460px;
+        }
+        .link-btn {
+            flex: 1;
+            padding: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 900;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-transform: uppercase;
+        }
+        .btn-1 { background: linear-gradient(45deg, #000, #1a1a1a); color: var(--gold); border-color: var(--gold); }
+        .btn-2 { background: linear-gradient(45deg, #000, #1a1a1a); color: var(--cyber-blue); border-color: var(--cyber-blue); }
+
+        /* --- Floating Widget --- */
         #floating-widget {
             position: fixed; top: 100px; right: 20px; width: 190px; height: 260px;
             background: rgba(0, 5, 10, 0.95); 
@@ -32,7 +54,6 @@
             padding: 15px; text-align: center; overflow: hidden;
         }
 
-        /* ডিজিটাল বর্ডার এনিমেশন */
         #floating-widget::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
             background: linear-gradient(90deg, transparent, var(--neon-green));
@@ -44,7 +65,6 @@
         .mini-id { font-size: 11px; color: var(--gold); margin-bottom: 5px; }
         .mini-timer { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 5px; font-family: 'Courier New', monospace; }
         
-        /* পপ-আপ সলো মোশন রেজাল্ট */
         .mini-res { 
             font-size: 45px; font-weight: 900; min-height: 60px;
             opacity: 0; filter: blur(25px); transform: scale(0.5);
@@ -57,16 +77,13 @@
         .mini-alert { font-size: 11px; color: var(--neon-red); font-weight: 900; display: none; animation: blink 0.6s infinite; margin-top: 5px; }
         .close-pop { position: absolute; top: 5px; right: 10px; color: #fff; cursor: pointer; font-weight: 900; font-size: 18px; z-index: 10; }
 
-        /* ফুলের ডিজাইন */
         .flower { position: absolute; font-size: 18px; animation: spin 6s linear infinite; opacity: 0.6; }
         @keyframes spin { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
         .f1 { top: 5px; left: 5px; } .f2 { bottom: 5px; right: 5px; }
 
-        /* --- Money Rain --- */
         .money { position: absolute; color: #00ff00; font-size: 25px; font-weight: bold; animation: fall 2.5s linear forwards; z-index: 1000; pointer-events: none; }
         @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-        /* --- Main UI --- */
         .rules-bar { background: var(--neon-red); color: white; width: 100%; padding: 12px; font-size: 14px; font-weight: 900; text-align: center; border-bottom: 4px solid #fff; }
         .main-title { font-size: 30px; font-weight: 900; text-shadow: 0 0 20px var(--neon-green); margin-top: 25px; letter-spacing: 5px; }
 
@@ -94,7 +111,6 @@
     <div id="floating-widget">
         <div class="close-pop" onclick="togglePop()">×</div>
         <div class="flower f1">🌸</div><div class="flower f2">🌸</div>
-        
         <div class="pop-header">PREMIUM COMMUNITY</div>
         <div class="mini-id" id="miniID">ID: #0000</div>
         <div class="mini-timer" id="miniTimer">00:00</div>
@@ -112,6 +128,11 @@
     </div>
 
     <div id="main-content">
+        <div class="channel-links">
+            <a href="https://amarclub.net/#/register?invitationCode=5723210678" target="_blank" class="link-btn btn-1">AMER CLUB</a>
+            <a href="https://dkwin12.com/#/register?invitationCode=48781152880" target="_blank" class="link-btn btn-2">DK WIN</a>
+        </div>
+
         <div style="display: flex; margin-bottom: 25px;">
             <button id="tab30" class="tab-btn" onclick="switchMode(30)">WINGO 30S</button>
             <button id="tab60" class="tab-btn active" onclick="switchMode(60)">WINGO 60S</button>
@@ -176,7 +197,6 @@
             document.getElementById('periodLabel').innerText = "ID: #" + id;
             document.getElementById('miniID').innerText = "ID: #" + id;
 
-            // ১০ সেকেন্ড ডিজিটাল ওয়ার্নিং
             if(r <= 10) {
                 document.getElementById('alertMsg').style.display = 'block';
                 document.getElementById('miniAlert').style.display = 'block';
@@ -201,21 +221,17 @@
     function triggerSignal() {
         const res = document.getElementById('resText');
         const mini = document.getElementById('miniRes');
-        
         res.classList.remove('show');
         mini.classList.remove('show');
 
         setTimeout(() => {
             res.innerText = store[mode].signal;
             mini.innerText = store[mode].signal;
-            
             const color = store[mode].signal === "BIG" ? "var(--neon-green)" : "var(--gold)";
             res.style.color = color;
             mini.style.color = color;
-            
             res.classList.add('show');
             mini.classList.add('show');
-            
             document.getElementById('accuracy').innerText = "AI PREDICTION: " + (94 + Math.floor(Math.random()*6)) + "%";
             document.getElementById('miniAcc').innerText = "CONFIDENCE: " + (94 + Math.floor(Math.random()*6)) + "%";
             
@@ -270,7 +286,6 @@
         document.getElementById('stepArea').innerHTML = s > 1 ? `<div style="background:#fff; color:#000; padding:10px 30px; border-radius:15px; font-weight:900; margin-top:20px; font-size:24px; box-shadow:0 0 20px #fff;">STEP ${s}</div>` : "";
     }
 
-    // Floating Widget Drag Logic
     const pop = document.getElementById("floating-widget");
     let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
     pop.addEventListener("touchstart", (e) => { initialX = e.touches[0].clientX - xOffset; initialY = e.touches[0].clientY - yOffset; active = true; }, false);
